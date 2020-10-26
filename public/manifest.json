@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Tic-Tac-Toe: Reinforced",
+  "name": "Tic-Tac-Toe online for 1 vs 1 or 1 vs AI",
   "icons": [
     {
       "src": "favicon.ico",
