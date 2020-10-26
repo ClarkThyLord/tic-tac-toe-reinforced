@@ -49,9 +49,23 @@ class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      type: 0,
+      xIsNext: true,
       squares: Array(9).fill(null),
-      xIsNext: true
     };
+  }
+
+  start(eve) {
+    console.log("Start");
+    this.setState({
+      xIsNext: true,
+      squares: Array(9).fill(null)
+    });
+  }
+
+  set_type(type) {
+    console.log("Type: ", type);
+    console.log(this);
   }
 
   handleClick(i) {
@@ -82,9 +96,25 @@ class Game extends React.Component {
 
     return (
       <div className="game">
-        <div className="game-info">
-          <h1>{status}</h1>
-        </div>
+      <div className="game-info">
+        <h1>{status}</h1>
+      </div>
+      <div className="game-opt">
+        <a className="opt" onClick={() => this.start()}>
+          Start
+        </a>
+      </div>
+      <div className="game-type">
+        <a href="#1v1" className="type" onClick={() => this.set_type(0)}>
+          1 v 1
+        </a>
+        <a href="#1vAI" className="type" onClick={() => this.set_type(1)}>
+          1 v AI
+        </a>
+        <a href="#AIvAI" className="type" onClick={() => this.set_type(2)}>
+          AI v AI
+        </a>
+      </div>
 
         <Board
             squares={this.state.squares}

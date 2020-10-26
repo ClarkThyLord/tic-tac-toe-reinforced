@@ -1,6 +1,6 @@
 {
   "short_name": "Tic-Tac-Toe: Reinforced",
-  "name": "Tic-Tac-Toe online for 1 vs 1 or 1 vs AI",
+  "name": "Tic-Tac-Toe online for 1 vs 1, 1 vs AI and AI vs AI",
   "icons": [
     {
       "src": "favicon.ico",
@@ -18,7 +18,7 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": ".",
+  "start_url": ".#1v1",
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff"
