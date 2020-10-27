@@ -72,10 +72,8 @@ class Game extends React.Component {
   }
 
   handleClick(i) {
-    console.log(calculateWinner(this.state.squares) > -1, this.state.squares[i], this.isAINext());
     if (calculateWinner(this.state.squares) > -1 || this.state.squares[i] > -1 || this.isAINext())
       return;
-    console.log("handle");
     this.handleMove(i);
   }
 
@@ -86,11 +84,13 @@ class Game extends React.Component {
 
     if (this.isAINext())
       setTimeout(() => {
-        let possible = [];
-        for (let i = 0; i < this.state.squares.length; i++)
-          if (this.state.squares[i] == -1)
-            possible.push(i);
-        this.handleMove(possible[Math.floor(Math.random() * possible.length)]);
+        let bestMove = findBestMove(this.state.player, this.state.squares);
+        this.handleMove(bestMove);
+        // let possible = [];
+        // for (let i = 0; i < this.state.squares.length; i++)
+        //   if (this.state.squares[i] == -1)
+        //     possible.push(i);
+        // this.handleMove(possible[Math.floor(Math.random() * possible.length)]);
       }, 250);
   }
 
@@ -177,6 +177,53 @@ function calculateWinner(squares) {
     return -1;
 }
 
-function find_best_move(board, xIsNext) {
+function minimax(player, squares, depth, maximizer) {
+  let winner = calculateWinner(squares);
+  if (winner === player)
+    return 10 - depth;
+  else if (winner === (player + 1) % 2)
+    return -10 + depth;
+  else if (winner == 2)
+    return 0;
 
+  if (maximizer) {
+    let best = -1000;
+    for (let i = 0; i < squares.length; i++) {
+      if (squares[i] === -1) {
+        squares[i] = player;
+        best = Math.max(best, minimax(player, squares, depth + 1, !maximizer))
+        squares[i] = -1;
+      }
+    }
+    return best;
+  } else {
+    let best = 1000;
+    for (let i = 0; i < squares.length; i++) {
+      if (squares[i] === -1) {
+        squares[i] = (player + 1) % 2;
+        best = Math.min(best, minimax(player, squares, depth + 1, !maximizer))
+        squares[i] = -1;
+      }
+    }
+    return best;
+  }
+}
+
+function findBestMove(player, squares) {
+  let best = -1000;
+  let move = -1;
+  
+  for (let i = 0; i < squares.length; i++) {
+    if (squares[i] === -1) {
+      squares[i] = player;
+      let value = minimax(player, squares, 0, false);
+      squares[i] = -1;
+      if (value > best) {
+        best = value;
+        move = i;
+      }
+    }
+  }
+
+  return move;
 }
