@@ -56,7 +56,6 @@ class Game extends React.Component {
   }
 
   start(eve) {
-    console.log("Start");
     this.setState({
       xIsNext: true,
       squares: Array(9).fill(null)
@@ -64,8 +63,8 @@ class Game extends React.Component {
   }
 
   set_type(type) {
-    console.log("Type: ", type);
-    console.log(this);
+    this.state.type = type;
+    this.start();
   }
 
   handleClick(i) {
@@ -88,10 +87,14 @@ class Game extends React.Component {
     const winner = calculateWinner(this.state.squares);
 
     let status;
-    if (winner) {
+    if (winner)
       status = "Winner: " + winner;
-    } else {
+    else if (this.state.squares.every(v => v != null))
+      status = "Draw";
+    else {
       status = "Next player: " + (this.state.xIsNext ? "X" : "O");
+      if ((this.state.type == 1 && !this.state.xIsNext) || this.state.type == 2)
+        status += " (AI)";
     }
 
     return (
