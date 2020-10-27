@@ -60,6 +60,12 @@ class Game extends React.Component {
       player: 0,
       squares: Array(9).fill(-1)
     });
+
+    switch (this.state.type) {
+      case 2:
+        this.AIMove();
+        break;
+    }
   }
 
   set_type(type) {
@@ -69,6 +75,16 @@ class Game extends React.Component {
 
   isAINext() {
     return (this.state.type === 1 && this.state.player === 1) || this.state.type === 2;
+  }
+
+  AIMove() {
+    let bestMove = findBestMove(this.state.player, this.state.squares);
+    this.handleMove(bestMove);
+    // let possible = [];
+    // for (let i = 0; i < this.state.squares.length; i++)
+    //   if (this.state.squares[i] == -1)
+    //     possible.push(i);
+    // this.handleMove(possible[Math.floor(Math.random() * possible.length)]);
   }
 
   handleClick(i) {
@@ -82,15 +98,10 @@ class Game extends React.Component {
     this.state.player = (this.state.player + 1) % 2;
     this.forceUpdate();
 
-    if (this.isAINext())
+    if (this.isAINext() && calculateWinner(this.state.squares) == -1)
       setTimeout(() => {
-        let bestMove = findBestMove(this.state.player, this.state.squares);
-        this.handleMove(bestMove);
-        // let possible = [];
-        // for (let i = 0; i < this.state.squares.length; i++)
-        //   if (this.state.squares[i] == -1)
-        //     possible.push(i);
-        // this.handleMove(possible[Math.floor(Math.random() * possible.length)]);
+        if (this.isAINext())
+          this.AIMove();
       }, 250);
   }
 
