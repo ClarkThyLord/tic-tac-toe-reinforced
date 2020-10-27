@@ -48,8 +48,24 @@ class Board extends React.Component {
 class Game extends React.Component {
   constructor(props) {
     super(props);
+
+    let type = 0;
+    if(window.location.hash) {
+      switch (window.location.hash) {
+        case "#1v1":
+          type = 0;
+          break;
+        case "#1vAI":
+          type = 1;
+          break;
+        case "#AIvAI":
+          type = 2;
+          break;
+      }
+    } 
+
     this.state = {
-      type: 0,
+      type: type,
       player: 0,
       squares: Array(9).fill(-1),
     };
