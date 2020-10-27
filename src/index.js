@@ -67,20 +67,29 @@ class Game extends React.Component {
     this.start();
   }
 
-  handleClick(i) {
-    if (calculateWinner(this.state.squares) || this.state.squares[i]) {
-      return;
-    }
-    this.state.squares[i] = this.state.xIsNext ? "X" : "O";
-    this.setState({
-      xIsNext: !this.state.xIsNext
-    });
+  isAINext() {
+    return (this.state.type == 1 && !this.state.xIsNext) || this.state.type == 2;
   }
 
-  jumpTo(step) {
-    this.setState({
-      xIsNext: (step % 2) === 0
-    });
+  handleClick(i) {
+    if (calculateWinner(this.state.squares) || this.state.squares[i] || this.isAINext())
+      return;
+    this.handleMove(i);
+  }
+
+  handleMove(position) {
+    this.state.squares[position] = this.state.xIsNext ? "X" : "O";
+    this.state.xIsNext = !this.state.xIsNext;
+    this.forceUpdate();
+
+    if (this.isAINext())
+      setTimeout(() => {
+        let possible = [];
+        for (let i = 0; i < this.state.squares.length; i++)
+          if (this.state.squares[i] == null)
+            possible.push(i);
+        this.handleMove(possible[Math.floor(Math.random() * possible.length)]);
+      }, 250);
   }
 
   render() {
@@ -93,7 +102,7 @@ class Game extends React.Component {
       status = "Draw";
     else {
       status = "Next player: " + (this.state.xIsNext ? "X" : "O");
-      if ((this.state.type == 1 && !this.state.xIsNext) || this.state.type == 2)
+      if (this.isAINext())
         status += " (AI)";
     }
 
@@ -152,3 +161,10 @@ function calculateWinner(squares) {
   return null;
 }
 
+function minmax(board, xIsNext) {
+
+}
+
+function find_best_move(board, xIsNext) {
+
+}
