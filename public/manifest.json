@@ -1,21 +1,11 @@
 {
   "short_name": "Tic-Tac-Toe: Reinforced",
-  "name": "Tic-Tac-Toe online for 1 vs 1, 1 vs AI and AI vs AI",
+  "name": "Online Tic-Tac-Toe, play: 1 v 1, 1 v AI and AI v AI",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "icon.svg",
       "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    },
-    {
-      "src": "logo192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "logo512.png",
-      "type": "image/png",
-      "sizes": "512x512"
+      "type": "image/svg"
     }
   ],
   "start_url": ".#1v1",
