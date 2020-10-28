@@ -1,0 +1,15 @@
+{
+  "short_name": "Tic-Tac-Toe: Reinforced",
+  "name": "Online Tic-Tac-Toe, play: 1 v 1, 1 v AI and AI v AI",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/svg"
+    }
+  ],
+  "start_url": ".#1v1",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
