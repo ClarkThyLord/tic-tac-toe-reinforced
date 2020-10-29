@@ -96,11 +96,6 @@ class Game extends React.Component {
   AIMove() {
     let bestMove = findBestMove(this.state.player, this.state.squares);
     this.handleMove(bestMove);
-    // let possible = [];
-    // for (let i = 0; i < this.state.squares.length; i++)
-    //   if (this.state.squares[i] == -1)
-    //     possible.push(i);
-    // this.handleMove(possible[Math.floor(Math.random() * possible.length)]);
   }
 
   handleClick(i) {
