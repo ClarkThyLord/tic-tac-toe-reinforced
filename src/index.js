@@ -6,7 +6,7 @@ function Square(props) {
   let className = "square square-" + props.index;
   return (
     <button className={className} onClick={props.onClick}>
-      {props.value}
+      {playerName(props.value)}
     </button>
   );
 }
@@ -16,7 +16,7 @@ class Board extends React.Component {
     return (
       <Square
         index={i}
-        value={playerName(this.props.squares[i])}
+        value={this.props.squares[i]}
         onClick={() => this.props.onClick(i)}
       />
     );
@@ -58,16 +58,21 @@ class Game extends React.Component {
         case "#1vAI":
           type = 1;
           break;
-        case "#AIvAI":
+        case "#TrainAI":
           type = 2;
           break;
+        case "#AIvAI":
+          type = 3;
+          break;
       }
-    } 
+    }
 
+    this.ai = new Q();
+    console.log(this.ai);
     this.state = {
       type: type,
       player: 0,
-      squares: Array(9).fill(-1),
+      squares: Array(9).fill(-1)
     };
   }
 
@@ -77,11 +82,7 @@ class Game extends React.Component {
       squares: Array(9).fill(-1)
     });
 
-    switch (this.state.type) {
-      case 2:
-        this.AIMove();
-        break;
-    }
+    if (this.isAINext()) this.AIMove();
   }
 
   set_type(type) {
@@ -90,12 +91,20 @@ class Game extends React.Component {
   }
 
   isAINext() {
-    return (this.state.type === 1 && this.state.player === 1) || this.state.type === 2;
+    return (this.state.type === 1 && this.state.player === 1) || this.state.type >= 2;
   }
 
   AIMove() {
-    let bestMove = findBestMove(this.state.player, this.state.squares);
-    this.handleMove(bestMove);
+    let move;
+    if (this.state.type == 2) {
+      if (this.state.player == 0)
+        move = findRandomMove(this.state.squares.slice());
+      else
+        move = this.ai.findNextMove(this.state.player, this.state.squares.slice());
+    } else if (this.state.type > 0) {
+      move = findBestMove(this.state.player, this.state.squares.slice());
+    }
+    this.handleMove(move);
   }
 
   handleClick(i) {
@@ -109,7 +118,7 @@ class Game extends React.Component {
     this.state.player = (this.state.player + 1) % 2;
     this.forceUpdate();
 
-    if (this.isAINext() && calculateWinner(this.state.squares) == -1)
+    if (this.isAINext() && calculateWinner(this.state.squares) === -1)
       setTimeout(() => {
         if (this.isAINext())
           this.AIMove();
@@ -117,23 +126,34 @@ class Game extends React.Component {
   }
 
   render() {
+    let message;
     const winner = calculateWinner(this.state.squares);
+    if (winner == 0 || winner == 1) {  
+      message = "Winner: " + playerName(winner) + ((this.state.type === 1 && winner == 1)? " (AI)": "");
 
-    let status;
-    if (winner == 0 || winner == 1)
-      status = "Winner: " + playerName(winner);
-    else if (winner == 2)
-      status = "Draw";
+      if (this.state.type == 2) {
+        this.ai.learn(winner == 1 ? 1 : -1);
+        // this.start();
+      }
+    }
+    else if (winner == 2) {
+      message = "Draw";
+
+      if (this.state.type == 2) {
+        this.ai.learn(0.1);
+        // this.start();
+      }
+    }
     else {
-      status = "Next player: " + playerName(this.state.player);
+      message = "Next player: " + playerName(this.state.player);
       if (this.isAINext())
-        status += " (AI)";
+        message += " (AI)";
     }
 
     return (
       <div className="game">
       <div className="game-info">
-        <h1>{status}</h1>
+        <h1>{message}</h1>
       </div>
       <div className="game-opt">
         <a className="opt" onClick={() => this.start()}>
@@ -147,7 +167,10 @@ class Game extends React.Component {
         <a href="#1vAI" className="type" onClick={() => this.set_type(1)}>
           1 v AI
         </a>
-        <a href="#AIvAI" className="type" onClick={() => this.set_type(2)}>
+        <a href="#TrainAI" className="type" onClick={() => this.set_type(2)}>
+          Train AI
+        </a>
+        <a href="#AIvAI" className="type" onClick={() => this.set_type(3)}>
           AI v AI
         </a>
       </div>
