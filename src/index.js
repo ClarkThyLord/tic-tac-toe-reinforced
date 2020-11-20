@@ -176,6 +176,18 @@ function playerName(player) {
   }
 }
 
+function getAvailableMoves(squares) {
+  let available = [];
+  for (let i = 0; i < squares.length; i++)
+    if (squares[i] == -1)
+      available.push(i);
+  return available;
+}
+
+function squaresToHash(squares) {
+  return squares.join();
+}
+
 function calculateWinner(squares) {
   const lines = [
     [0, 1, 2],
@@ -248,4 +260,57 @@ function findBestMove(player, squares) {
   }
 
   return move;
+}
+
+function findRandomMove(squares) {
+  const available = getAvailableMoves(squares);
+  return available[Math.floor(Math.random() * available.length)];
+}
+
+function Q() {
+  this.decay = 0.8;
+  this.learningRate = 0.2;
+  this.exploringRate = 0.1;
+  this.states = {};
+  this.statesHistory = [];
+
+  this.findNextMove = function (player, squares) {
+    let move;
+    let probability = Math.random();
+    if (probability <= this.exploringRate)
+      move = findRandomMove(squares);
+    else {
+      const moves = getAvailableMoves(squares);
+      move = moves[0];
+      let max = -Infinity;
+
+      for (let i = 0; i < moves.length; i++) {
+        const mov = moves[i];
+        squares[mov] = player;
+        const hash = squaresToHash(squares);
+        const state_val = this.states[hash] === undefined ? 0 : this.states[hash];
+        if (state_val > max) {
+          move = mov;
+          max = state_val;
+        }
+        squares[mov] = -1;
+      }
+    }
+
+    squares[move] = player;
+    this.statesHistory.push(squaresToHash(squares));
+
+    return move;
+  };
+
+  this.learn = function (reward) {
+    for (let i = 0; i < this.statesHistory.length; i++) {
+      const hash = this.statesHistory[i];
+      if (this.states[hash] === undefined)
+        this.states[hash] = 0;
+      this.states[hash] += this.learningRate * (this.decay * reward - this.states[hash]);
+      reward = this.states[hash];
+    }
+    this.statesHistory = [];
+  }
 }
