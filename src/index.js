@@ -55,20 +55,22 @@ class Game extends React.Component {
         case "#1v1":
           type = 0;
           break;
-        case "#1vAI":
+        case "#1vMM":
           type = 1;
           break;
-        case "#TrainAI":
+        case "#TrainQ":
           type = 2;
           break;
-        case "#AIvAI":
+        case "#1vQ":
           type = 3;
+          break;
+        case "#MMvQ":
+          type = 4;
           break;
       }
     }
 
-    this.ai = new Q();
-    console.log(this.ai);
+    this.q = new Q();
     this.state = {
       type: type,
       player: 0,
@@ -100,7 +102,7 @@ class Game extends React.Component {
       if (this.state.player == 0)
         move = findRandomMove(this.state.squares.slice());
       else
-        move = this.ai.findNextMove(this.state.player, this.state.squares.slice());
+        move = this.q.findNextMove(this.state.player, this.state.squares.slice());
     } else if (this.state.type > 0) {
       move = findBestMove(this.state.player, this.state.squares.slice());
     }
@@ -127,23 +129,37 @@ class Game extends React.Component {
 
   render() {
     let message;
+    let options;
     const winner = calculateWinner(this.state.squares);
     if (this.state.type == 2) {
       switch (winner) {
         case 0:
-          this.ai.lost();
+          this.q.lost();
           break;
         case 1:
-          this.ai.won();
+          this.q.won();
           break;
         case 2:
-          this.ai.drew();
+          this.q.drew();
           break;
       }
       if (winner > -1) 
         setTimeout(() => this.start(), 10);
 
-      message = `Wins: ${this.ai.wins} Losses: ${this.ai.losses} Draws: ${this.ai.draws}`;
+      options = (
+        <span>
+          <a className="opt" onClick={() => this.q.save()}>
+            Save
+          </a>
+          <a className="opt" onClick={() => this.q.load()}>
+            Load
+          </a>
+          <a className="opt" onClick={() => this.q.clear()}>
+            Clear
+          </a>
+        </span> 
+      );
+      message = `Wins: ${this.q.wins} Losses: ${this.q.losses} Draws: ${this.q.draws}`;
     } else {
       if (winner == 0 || winner == 1) {  
         message = "Winner: " + playerName(winner) + ((this.state.type === 1 && winner == 1) ? " (AI)": "");
@@ -167,19 +183,23 @@ class Game extends React.Component {
         <a className="opt" onClick={() => this.start()}>
           Start
         </a>
+        { options }
       </div>
       <div className="game-type">
         <a href="#1v1" className="type" onClick={() => this.set_type(0)}>
           1 v 1
         </a>
-        <a href="#1vAI" className="type" onClick={() => this.set_type(1)}>
-          1 v AI
+        <a href="#1vMM" className="type" onClick={() => this.set_type(1)}>
+          1 v MiniMax
         </a>
-        <a href="#TrainAI" className="type" onClick={() => this.set_type(2)}>
-          Train AI
+        <a href="#TrainQ" className="type" onClick={() => this.set_type(2)}>
+          Train Q
         </a>
-        <a href="#AIvAI" className="type" onClick={() => this.set_type(3)}>
-          AI v AI
+        <a href="#1vQ" className="type" onClick={() => this.set_type(3)}>
+          1 v Q
+        </a>
+        <a href="#MMvQ" className="type" onClick={() => this.set_type(4)}>
+          MiniMax v Q
         </a>
       </div>
 
@@ -337,6 +357,35 @@ function Q() {
 
     return move;
   };
+
+  this.save = function () {
+    localStorage.setItem("wins", this.wins);
+    localStorage.setItem("losses", this.losses);
+    localStorage.setItem("draws", this.draws);
+    localStorage.setItem("states", JSON.stringify(this.states));
+  }
+
+  this.load = function () {
+    let temp = localStorage.getItem("wins");
+    if (temp !== null)
+      this.wins = parseInt(temp);
+    temp = localStorage.getItem("losses");
+    if (temp !== null)
+      this.losses = parseInt(temp);
+    temp = localStorage.getItem("draws");
+    if (temp !== null)
+      this.draws = parseInt(temp);
+    temp = localStorage.getItem("states");
+    if (temp !== null)
+      this.states = JSON.parse(temp);
+  }
+
+  this.clear = function () {
+    localStorage.removeItem("wins");
+    localStorage.removeItem("losses");
+    localStorage.removeItem("draws");
+    localStorage.removeItem("states");
+  }
 
   this.learn = function (reward) {
     for (let i = 0; i < this.statesHistory.length; i++) {
