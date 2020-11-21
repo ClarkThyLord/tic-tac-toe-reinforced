@@ -122,32 +122,40 @@ class Game extends React.Component {
       setTimeout(() => {
         if (this.isAINext())
           this.AIMove();
-      }, 250);
+      }, this.state.type == 2 ? 10 : 250);
   }
 
   render() {
     let message;
     const winner = calculateWinner(this.state.squares);
-    if (winner == 0 || winner == 1) {  
-      message = "Winner: " + playerName(winner) + ((this.state.type === 1 && winner == 1)? " (AI)": "");
-
-      if (this.state.type == 2) {
-        this.ai.learn(winner == 1 ? 1 : -1);
-        // this.start();
+    if (this.state.type == 2) {
+      switch (winner) {
+        case 0:
+          this.ai.lost();
+          break;
+        case 1:
+          this.ai.won();
+          break;
+        case 2:
+          this.ai.drew();
+          break;
       }
-    }
-    else if (winner == 2) {
-      message = "Draw";
+      if (winner > -1) 
+        setTimeout(() => this.start(), 10);
 
-      if (this.state.type == 2) {
-        this.ai.learn(0.1);
-        // this.start();
+      message = `Wins: ${this.ai.wins} Losses: ${this.ai.losses} Draws: ${this.ai.draws}`;
+    } else {
+      if (winner == 0 || winner == 1) {  
+        message = "Winner: " + playerName(winner) + ((this.state.type === 1 && winner == 1) ? " (AI)": "");
       }
-    }
-    else {
-      message = "Next player: " + playerName(this.state.player);
-      if (this.isAINext())
-        message += " (AI)";
+      else if (winner == 2) {
+        message = "Draw";
+      }
+      else {
+        message = "Next player: " + playerName(this.state.player);
+        if (this.isAINext())
+          message += " (AI)";
+      }
     }
 
     return (
@@ -297,6 +305,10 @@ function Q() {
   this.states = {};
   this.statesHistory = [];
 
+  this.wins = 0;
+  this.losses = 0;
+  this.draws = 0;
+
   this.findNextMove = function (player, squares) {
     let move;
     let probability = Math.random();
@@ -335,5 +347,20 @@ function Q() {
       reward = this.states[hash];
     }
     this.statesHistory = [];
+  }
+
+  this.won = function () {
+    this.wins += 1;
+    this.learn(1);
+  }
+
+  this.lost = function () {
+    this.losses += 1;
+    this.learn(-1);
+  }
+
+  this.drew = function () {
+    this.draws += 1;
+    this.learn(0.1);
   }
 }
