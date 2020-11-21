@@ -381,9 +381,13 @@ function Q() {
   }
 
   this.clear = function () {
+    this.wins = 0;
     localStorage.removeItem("wins");
+    this.losses = 0;
     localStorage.removeItem("losses");
+    this.draws = 0;
     localStorage.removeItem("draws");
+    this.states = {};
     localStorage.removeItem("states");
   }
 
