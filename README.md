@@ -7,19 +7,19 @@
 
 <p align="center">
 	<a href="https://github.com/ClarkThyLord/tic-tac-toe-reinforced/releases">
-		<img src="https://img.shields.io/badge/Version-0.1.0-green.svg" alt="Version">
+		<img src="https://img.shields.io/badge/Version-1.0.0-green.svg" alt="Version">
 	</a>
 	<a href="https://github.com/ClarkThyLord/tic-tac-toe-reinforced/blob/master/LICENSE">
 		<img src="https://img.shields.io/badge/License-MIT-brightgreen.svg" alt="License">
 	</a>
 </p>
 
-> Online Tic-Tac-Toe, play: 1 v 1, 1 v AI and AI v AI
+> Online Tic-Tac-Toe, play: 1 v 1, 1 v MiniMax, 1 v Q-learn, MiniMax v Q-learn
 
 ---
 
 # About
-Online Tic-Tac-Toe made with React, you can play 1 v 1, 1 v AI and AI v AI. The available AIs are minimax and reinforcement learning.
+Online Tic-Tac-Toe made with React, you can play 1 v 1, 1 v MiniMax, 1 v Q-learn, MiniMax v Q-learn and train the Q-learn algorithm.
 
 ## Setup
 Install required node packages:
