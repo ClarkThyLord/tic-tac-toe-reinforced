@@ -84,7 +84,8 @@ class Game extends React.Component {
       squares: Array(9).fill(-1)
     });
 
-    if (this.isAINext()) this.AIMove();
+    if (this.state.type === 2 || this.state.type === 4)
+      this.AIMove();
   }
 
   set_type(type) {
@@ -93,18 +94,30 @@ class Game extends React.Component {
   }
 
   isAINext() {
-    return (this.state.type === 1 && this.state.player === 1) || this.state.type >= 2;
+    return ((this.state.type === 1 || this.state.type === 3) && this.state.player === 1) || this.state.type === 2 || this.state.type === 4;
   }
 
   AIMove() {
     let move;
-    if (this.state.type == 2) {
-      if (this.state.player == 0)
-        move = findRandomMove(this.state.squares.slice());
-      else
+    switch (this.state.type) {
+      case 1:
+        move = findBestMove(this.state.player, this.state.squares.slice());
+        break;
+      case 2:
+        if (this.state.player === 0)
+          move = findRandomMove(this.state.squares.slice());
+        else
+          move = this.q.findNextMove(this.state.player, this.state.squares.slice());
+        break;
+      case 3:
         move = this.q.findNextMove(this.state.player, this.state.squares.slice());
-    } else if (this.state.type > 0) {
-      move = findBestMove(this.state.player, this.state.squares.slice());
+        break;
+      case 4:
+        if (this.state.player === 0)
+          move = findBestMove(this.state.player, this.state.squares.slice());
+        else
+          move = this.q.findNextMove(this.state.player, this.state.squares.slice());
+        break;
     }
     this.handleMove(move);
   }
@@ -124,14 +137,14 @@ class Game extends React.Component {
       setTimeout(() => {
         if (this.isAINext())
           this.AIMove();
-      }, this.state.type == 2 ? 10 : 250);
+      }, this.state.type === 2 ? 10 : 250);
   }
 
   render() {
     let message;
     let options;
     const winner = calculateWinner(this.state.squares);
-    if (this.state.type == 2) {
+    if (this.state.type === 2) {
       switch (winner) {
         case 0:
           this.q.lost();
@@ -161,16 +174,20 @@ class Game extends React.Component {
       );
       message = `Wins: ${this.q.wins} Losses: ${this.q.losses} Draws: ${this.q.draws}`;
     } else {
-      if (winner == 0 || winner == 1) {  
-        message = "Winner: " + playerName(winner) + ((this.state.type === 1 && winner == 1) ? " (AI)": "");
+      if (winner === 0 || winner === 1) {  
+        message = "Winner: " + playerName(winner);
       }
-      else if (winner == 2) {
+      else if (winner === 2) {
         message = "Draw";
       }
       else {
         message = "Next player: " + playerName(this.state.player);
-        if (this.isAINext())
-          message += " (AI)";
+        if (this.isAINext()) {
+          if (this.state.type === 1 || (this.state.type === 4 && this.state.player === 0))
+            message += " (MiniMax)";
+          else if ((this.state.type === 3 && this.state.player === 1)  || (this.state.type === 4 && this.state.player === 1))
+            message += "(Q)";
+        }
       }
     }
 
@@ -230,7 +247,7 @@ function playerName(player) {
 function getAvailableMoves(squares) {
   let available = [];
   for (let i = 0; i < squares.length; i++)
-    if (squares[i] == -1)
+    if (squares[i] === -1)
       available.push(i);
   return available;
 }
@@ -256,7 +273,7 @@ function calculateWinner(squares) {
       return squares[a];
     }
   }
-  if (squares.every(v => v != -1))
+  if (squares.every(v => v !== -1))
     return 2;
   else
     return -1;
@@ -268,7 +285,7 @@ function minimax(player, squares, depth, maximizer) {
     return 10 - depth;
   else if (winner === (player + 1) % 2)
     return -10 + depth;
-  else if (winner == 2)
+  else if (winner === 2)
     return 0;
 
   if (maximizer) {
